@@ -1,20 +1,17 @@
+package org.usfirst.frc.team4828;
 
-package org.usfirst.frc.team4828.robot;
-
-import com.ctre.CANTalon;
-
-import edu.wpi.first.wpilibj.IterativeRobot;
-import edu.wpi.first.wpilibj.Timer;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import edu.wpi.first.wpilibj.*;
 
 public class Robot extends IterativeRobot {
-	CANTalon fl, fr, bl, br;
+	TalonSRX fl, fr, bl, br;
 	Tester t;
 	private boolean ranAuton;
 	public void robotInit() {
-		fl = new CANTalon(Ports.FRONT_LEFT);
-		fr = new CANTalon(Ports.FRONT_RIGHT);
-		bl = new CANTalon(Ports.BACK_LEFT);
-		br = new CANTalon(Ports.BACK_RIGHT);
+		fl = new TalonSRX(Ports.FRONT_LEFT);
+		fr = new TalonSRX(Ports.FRONT_RIGHT);
+		bl = new TalonSRX(Ports.BACK_LEFT);
+		br = new TalonSRX(Ports.BACK_RIGHT);
 		
 		t = new Tester();
     }

@@ -1,4 +1,4 @@
-package org.usfirst.frc.team4828.robot;
+package org.usfirst.frc.team4828;
 
 public class Ports {
 	public static final int FRONT_LEFT = 1;
