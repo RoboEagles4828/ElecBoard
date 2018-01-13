@@ -3,16 +3,24 @@ package org.usfirst.frc.team4828;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
 
+import javax.sound.sampled.Port;
+
 public class Robot extends IterativeRobot {
+	Joystick j;
 	TalonSRX fl, fr, bl, br;
 	Tester t;
+	Pneumatic p;
 	private boolean ranAuton;
 	public void robotInit() {
 		fl = new TalonSRX(Ports.FRONT_LEFT);
 		fr = new TalonSRX(Ports.FRONT_RIGHT);
 		bl = new TalonSRX(Ports.BACK_LEFT);
 		br = new TalonSRX(Ports.BACK_RIGHT);
-		
+
+		j = new Joystick(Ports.JOYSTICK);
+
+		p = new Pneumatic(Ports.COMPRESSOR, Ports.SOLENOID_LEFT, Ports.SOLENOID_RIGHT);
+
 		t = new Tester();
     }
     
@@ -32,12 +40,19 @@ public class Robot extends IterativeRobot {
 
     public void teleopInit() {
     	System.out.println(" --- Start Teleop Init ---");
-		
+
     	System.out.println(" --- Start Teleop ---");
     }
     
     public void teleopPeriodic() {
-
+		if(!p.enabled()) {
+			if (j.getRawButton(1)) {
+				p.forward();
+			}
+			if (j.getRawButton(2)) {
+				p.reverse();
+			}
+		}
     }
     
     public void testPeriodic() {

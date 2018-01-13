@@ -12,6 +12,9 @@ public class Pneumatic {
 
         s = new DoubleSolenoid(sol1, sol2);
     }
+    public boolean enabled() {
+        return c.enabled();
+    }
     public double compVal() {
         return c.getCompressorCurrent();
     }
