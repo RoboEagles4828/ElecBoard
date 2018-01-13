@@ -3,8 +3,6 @@ package org.usfirst.frc.team4828;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
 
-import javax.sound.sampled.Port;
-
 public class Robot extends IterativeRobot {
 	Joystick j;
 	TalonSRX fl, fr, bl, br;
@@ -45,6 +43,7 @@ public class Robot extends IterativeRobot {
     }
     
     public void teleopPeriodic() {
+
 		if(!p.enabled()) {
 			if (j.getRawButton(1)) {
 				p.forward();
@@ -53,6 +52,8 @@ public class Robot extends IterativeRobot {
 				p.reverse();
 			}
 		}
+		System.out.println(p.enabled() + " " + p.compVal());
+		Timer.delay(.1);
     }
     
     public void testPeriodic() {
