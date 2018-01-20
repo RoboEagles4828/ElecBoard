@@ -5,59 +5,70 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
 
 public class Robot extends IterativeRobot {
-	TalonSRX fl, fr, bl, br;
-	Tester t;
-	private boolean ranAuton;
 
-	Joystick j;
-	Pneumatic p;
-	public void robotInit() {
-		CameraServer.getInstance().startAutomaticCapture();
+    TalonSRX fl, fr, bl, br;
+    Joystick j;
+    Tester t;
+    Pneumatic p;
+    private boolean ranAuton;
 
-		fl = new TalonSRX(Ports.FRONT_LEFT);
-		fr = new TalonSRX(Ports.FRONT_RIGHT);
-		bl = new TalonSRX(Ports.BACK_LEFT);
-		br = new TalonSRX(Ports.BACK_RIGHT);
+    public void robotInit() {
+        CameraServer.getInstance().startAutomaticCapture();
 
-		j = new Joystick(Ports.JOYSTICK);
+        fl = new TalonSRX(Ports.FRONT_LEFT);
+        fr = new TalonSRX(Ports.FRONT_RIGHT);
+        bl = new TalonSRX(Ports.BACK_LEFT);
+        br = new TalonSRX(Ports.BACK_RIGHT);
 
-		p = new Pneumatic(Ports.COMPRESSOR, Ports.SOLENOID_LEFT, Ports.SOLENOID_RIGHT);
+        j = new Joystick(Ports.JOYSTICK);
 
-		t = new Tester();
+        p = new Pneumatic(Ports.COMPRESSOR, Ports.SOLENOID_LEFT, Ports.SOLENOID_RIGHT);
+
+        t = new Tester();
     }
-    
+
     public void autonomousInit() {
-    	System.out.println(" --- Start Auton Init ---");
-    	ranAuton = false;
-    	System.out.println(" --- Start Auton ---");
+        System.out.println(" --- Start Auton Init ---");
+        ranAuton = false;
+        System.out.println(" --- Start Auton ---");
     }
 
     public void autonomousPeriodic() {
-    	if(!ranAuton) {
-    		t.testMotors(fl, fr, bl, br, .3);
-    		ranAuton = true;
-    	}
-    	Timer.delay(.1);
+        if (!ranAuton) {
+            t.testMotors(fl, fr, bl, br, .3);
+            ranAuton = true;
+        }
+
+        Timer.delay(.1);
     }
 
     public void teleopInit() {
-    	System.out.println(" --- Start Teleop Init ---");
+        System.out.println(" --- Start Teleop Init ---");
 
-    	System.out.println(" --- Start Teleop ---");
+        System.out.println(" --- Start Teleop ---");
     }
-    
+
     public void teleopPeriodic() {
 
+        Timer.delay(.1);
     }
-    
-    public void testPeriodic() {
-      double speed1 = j.getThrottle();
-      double speed2 = j.getThrottle();
 
-      fl.set(ControlMode.PercentOutput, speed1);
-      fr.set(ControlMode.PercentOutput, speed2);
-      bl.set(ControlMode.PercentOutput, speed1);
-      br.set(ControlMode.PercentOutput, speed2);
+    public void testInit() {
+        System.out.println(" --- Start Test Init ---");
+
+        System.out.println(" --- Start Test ---");
     }
-    
+
+    public void testPeriodic() {
+        double speed1 = j.getThrottle();
+        double speed2 = j.getThrottle();
+
+        fl.set(ControlMode.PercentOutput, speed1);
+        fr.set(ControlMode.PercentOutput, speed2);
+        bl.set(ControlMode.PercentOutput, speed1);
+        br.set(ControlMode.PercentOutput, speed2);
+
+        Timer.delay(.1);
+    }
+
 }
