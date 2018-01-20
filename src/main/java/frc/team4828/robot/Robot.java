@@ -1,5 +1,4 @@
-package org.usfirst.frc.team4828;
-
+package frc.team4828.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
@@ -11,6 +10,9 @@ public class Robot extends IterativeRobot {
 	Pneumatic p;
 	private boolean ranAuton;
 	public void robotInit() {
+
+		CameraServer.getInstance().startAutomaticCapture();
+
 		fl = new TalonSRX(Ports.FRONT_LEFT);
 		fr = new TalonSRX(Ports.FRONT_RIGHT);
 		bl = new TalonSRX(Ports.BACK_LEFT);
