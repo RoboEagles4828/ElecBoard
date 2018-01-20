@@ -8,18 +8,10 @@ public class Robot extends IterativeRobot {
 	TalonSRX fl, fr, bl, br;
 	Tester t;
 	private boolean ranAuton;
-	
-	public void robotInit() {
-		
-		CameraServer.getInstance().startAutomaticCapture();
-		
-	Joystick j;
-	TalonSRX fl, fr, bl, br;
-	Tester t;
-	Pneumatic p;
-	private boolean ranAuton;
-	public void robotInit() {
 
+	Joystick j;
+	Pneumatic p;
+	public void robotInit() {
 		CameraServer.getInstance().startAutomaticCapture();
 
 		fl = new TalonSRX(Ports.FRONT_LEFT);
@@ -56,19 +48,6 @@ public class Robot extends IterativeRobot {
     
     public void teleopPeriodic() {
 
-    }
-    
-    public void testPeriodic() {
-      if(!p.enabled()) {
-        if (j.getRawButton(1)) {
-          p.forward();
-        }
-        if (j.getRawButton(2)) {
-          p.reverse();
-        }
-      }
-      System.out.println(p.enabled() + " " + p.compVal());
-      Timer.delay(.1);
     }
     
     public void testPeriodic() {
