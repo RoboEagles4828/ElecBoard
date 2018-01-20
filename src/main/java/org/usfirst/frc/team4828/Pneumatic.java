@@ -9,7 +9,6 @@ public class Pneumatic {
     Pneumatic(int comp, int sol1, int sol2) {
         c = new Compressor(comp);
         c.setClosedLoopControl(true);
-
         s = new DoubleSolenoid(sol1, sol2);
     }
     public boolean enabled() {
