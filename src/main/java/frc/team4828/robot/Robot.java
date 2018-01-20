@@ -8,13 +8,10 @@ public class Robot extends IterativeRobot {
 	TalonSRX fl, fr, bl, br;
 	Tester t;
 	private boolean ranAuton;
-	
-	CameraServer.getInstance().startAutomaticCapture();
-		
+
 	Joystick j;
 	Pneumatic p;
 	public void robotInit() {
-
 		CameraServer.getInstance().startAutomaticCapture();
 
 		fl = new TalonSRX(Ports.FRONT_LEFT);
