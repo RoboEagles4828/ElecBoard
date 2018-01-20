@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.*;
 
 public class Robot extends IterativeRobot {
 	private DriveTrain drive;
-	private Joystick driveStick
+	private Joystick driveStick;
 	TalonSRX fl, fr, bl, br;
 	Tester t;
 	private boolean ranAuton;
