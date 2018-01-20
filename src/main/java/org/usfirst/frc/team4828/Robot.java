@@ -1,5 +1,6 @@
 package org.usfirst.frc.team4828;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
 
@@ -57,7 +58,13 @@ public class Robot extends IterativeRobot {
     }
     
     public void testPeriodic() {
+		double speed1 = j.getThrottle();
+	    double speed2 = j.getThrottle();
 
+		fl.set(ControlMode.PercentOutput, speed1);
+		fr.set(ControlMode.PercentOutput, speed2);
+		bl.set(ControlMode.PercentOutput, speed1);
+		br.set(ControlMode.PercentOutput, speed2);
     }
     
 }
