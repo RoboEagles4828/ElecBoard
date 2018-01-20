@@ -33,18 +33,16 @@ deploy {
 // and NavX.
 dependencies {
     compile wpilib()
-    compile navx()
     compile ctre()
+    compile navx()
 
     compile group: 'junit', name: 'junit', version: '4.12'
     compile fileTree(dir: "libs", include: "*.jar")
     nativeLib fileTree(dir: 'libs', include: '**/*.so')
 }
-
 // Setting up my Jar File. In this case, adding all libraries into the main jar ('fat jar')
 // in order to make them all available at runtime. Also adding the manifest so WPILib
 // knows where to look for our Robot Class.
-
 jar {
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     manifest jaci.openrio.gradle.GradleRIOPlugin.javaManifest(ROBOT_CLASS)
