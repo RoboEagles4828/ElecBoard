@@ -11,6 +11,7 @@ public class Robot extends IterativeRobot {
 
 	Joystick j;
 	Pneumatic p;
+	Servo s;
 	public void robotInit() {
 		CameraServer.getInstance().startAutomaticCapture();
 
@@ -22,6 +23,8 @@ public class Robot extends IterativeRobot {
 		j = new Joystick(Ports.JOYSTICK);
 
 		p = new Pneumatic(Ports.COMPRESSOR, Ports.SOLENOID_LEFT, Ports.SOLENOID_RIGHT);
+
+		s = new Servo(0);
 
 		t = new Tester();
     }
@@ -45,19 +48,21 @@ public class Robot extends IterativeRobot {
 
     	System.out.println(" --- Start Teleop ---");
     }
-    
-    public void teleopPeriodic() {
-
+    double curr;
+	public void teleopPeriodic() {
+		curr = 0;
     }
     
     public void testPeriodic() {
-      double speed1 = j.getThrottle();
-      double speed2 = j.getThrottle();
-
-      fl.set(ControlMode.PercentOutput, speed1);
-      fr.set(ControlMode.PercentOutput, speed2);
-      bl.set(ControlMode.PercentOutput, speed1);
-      br.set(ControlMode.PercentOutput, speed2);
+		s.set(curr);
+		if(j.getRawButton(1)) {
+			curr+=.01;
+		}
+		if(j.getRawButton(2)) {
+			curr-=.01;
+		}
+		System.out.println(curr);
+		Timer.delay(.1);
     }
     
 }
