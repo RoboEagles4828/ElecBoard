@@ -51,7 +51,6 @@ public class Robot extends IterativeRobot {
 
     public void teleopPeriodic() {
         drive.arcadeDrive(j.getX(), -j.getY(), j.getTwist());
-        drive.debugNavx();
         drive.updateDashboard();
         Timer.delay(.1);
     }

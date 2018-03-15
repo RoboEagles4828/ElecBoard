@@ -222,10 +222,6 @@ public class DriveTrain {
         navx.reset();
     }
 
-    public void debugNavx() {
-        System.out.println(" Navx: " + navx.getAngle());
-    }
-
     /**
      * Updates DriveTrain values on SmartDashboard.
      */
