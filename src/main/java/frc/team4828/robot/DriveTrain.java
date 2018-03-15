@@ -3,7 +3,7 @@ package frc.team4828.robot;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -14,13 +14,13 @@ public class DriveTrain {
 
     // MoveDistance Constants
     private static final double ENC_RATIO = 25.464; // [ NU / Inch ] => [ NU / Rotations / 6π ]
-    private static final double CORRECTION_FACTOR = 0.05;
+    private static final double CORRECTION_FACTOR = 0.01;
     private static final double ANGLE_THRESH = 0.1;
     private static final double ANGLE_CHECK_DELAY = 0.01;
     private static final double TIMEOUT = 10;
 
     // TurnDegrees Constants
-    private static final double TURN_FACTOR = 0.01;
+    private static final double TURN_FACTOR = 0.1;
 
     /**
      * DriveTrain for the robot.
@@ -34,7 +34,7 @@ public class DriveTrain {
         fr = new TalonSRX(frPort);
         bl = new TalonSRX(blPort);
         br = new TalonSRX(brPort);
-        navx = new AHRS(SerialPort.Port.kMXP);
+        navx = new AHRS(SPI.Port.kMXP);
         navx.reset();
     }
 
@@ -170,7 +170,7 @@ public class DriveTrain {
                 drive(speed);
             }
             if (Math.abs(fl.getSelectedSensorPosition(0) - startEncL) >= maxEnc
-                    && Math.abs(fr.getSelectedSensorPosition(0) - startEncR) >= maxEnc) {
+                    || Math.abs(fr.getSelectedSensorPosition(0) - startEncR) >= maxEnc) {
                 brake();
                 break;
             }
@@ -220,6 +220,10 @@ public class DriveTrain {
      */
     public void reset() {
         navx.reset();
+    }
+
+    public void debugNavx() {
+        System.out.println(" Navx: " + navx.getAngle());
     }
 
     /**

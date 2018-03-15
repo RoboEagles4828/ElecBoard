@@ -1,44 +1,45 @@
 package frc.team4828.robot;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.*;
 
 public class Robot extends IterativeRobot {
 
-    TalonSRX fl, fr, bl, br;
     Joystick j;
-    Tester t;
-    Pneumatic p;
-    private boolean ranAuton;
+    DriveTrain drive;
+    private boolean doneAuton;
 
     public void robotInit() {
-        CameraServer.getInstance().startAutomaticCapture();
-
-        fl = new TalonSRX(Ports.FRONT_LEFT);
-        fr = new TalonSRX(Ports.FRONT_RIGHT);
-        bl = new TalonSRX(Ports.BACK_LEFT);
-        br = new TalonSRX(Ports.BACK_RIGHT);
-
         j = new Joystick(Ports.JOYSTICK);
-
-        p = new Pneumatic(Ports.COMPRESSOR, Ports.SOLENOID_LEFT, Ports.SOLENOID_RIGHT);
-
-        t = new Tester();
+        drive = new DriveTrain(Ports.FRONT_LEFT, Ports.FRONT_RIGHT, Ports.BACK_LEFT, Ports.BACK_RIGHT);
     }
 
     public void autonomousInit() {
         System.out.println(" --- Start Auton Init ---");
-        ranAuton = false;
+        doneAuton = false;
+        drive.reset();
+        drive.zeroEnc();
         System.out.println(" --- Start Auton ---");
     }
 
     public void autonomousPeriodic() {
-        if (!ranAuton) {
-            t.testMotors(fl, fr, bl, br, .3);
-            ranAuton = true;
+        if (!doneAuton) {
+            drive.moveDistance(72, 0.5);
+            Timer.delay(1);
+            drive.turnDegAbs(90, 0.5);
+            Timer.delay(1);
+            drive.moveDistance(36, 0.5);
+            Timer.delay(1);
+            drive.turnDegAbs(180, 0.5);
+            Timer.delay(1);
+            drive.moveDistance(72, 0.5);
+            Timer.delay(1);
+            drive.turnDegAbs(270, 0.5);
+            Timer.delay(1);
+            drive.moveDistance(36, 0.5);
+            Timer.delay(1);
+            drive.turnDegAbs(360, 0.5);
+            doneAuton = true;
         }
-
         Timer.delay(.1);
     }
 
@@ -49,7 +50,9 @@ public class Robot extends IterativeRobot {
     }
 
     public void teleopPeriodic() {
-
+        drive.arcadeDrive(j.getX(), -j.getY(), j.getTwist());
+        drive.debugNavx();
+        drive.updateDashboard();
         Timer.delay(.1);
     }
 
@@ -60,14 +63,6 @@ public class Robot extends IterativeRobot {
     }
 
     public void testPeriodic() {
-        double speed1 = j.getThrottle();
-        double speed2 = j.getThrottle();
-
-        fl.set(ControlMode.PercentOutput, speed1);
-        fr.set(ControlMode.PercentOutput, speed2);
-        bl.set(ControlMode.PercentOutput, speed1);
-        br.set(ControlMode.PercentOutput, speed2);
-
         Timer.delay(.1);
     }
 
