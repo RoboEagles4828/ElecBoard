@@ -13,14 +13,15 @@ public class DriveTrain {
     private AHRS navx;
 
     // MoveDistance Constants
-    private static final double ENC_RATIO = 25.464; // [ NU / Inch ] => [ NU / Rotations / 6π ]
-    private static final double CORRECTION_FACTOR = 0.01;
+    private static final double ENC_RATIO = 78.33; // [ NU / Inch ] => [ NU / Rotations / 6π ]
+    private static final double CORRECTION_FACTOR = 0.2;
     private static final double ANGLE_THRESH = 0.1;
     private static final double ANGLE_CHECK_DELAY = 0.01;
-    private static final double TIMEOUT = 10;
+    private static final double TIMEOUT = 5;
 
     // TurnDegrees Constants
-    private static final double TURN_FACTOR = 0.1;
+    private static final double TURN_FACTOR = 0.2;
+    private static final double ANGLE_THRESH_TURN = 1;
 
     /**
      * DriveTrain for the robot.
@@ -189,12 +190,15 @@ public class DriveTrain {
         double changeAngle;
         while (Timer.getFPGATimestamp() - startTime < TIMEOUT) {
             changeAngle = angle - navx.getAngle();
-            if (Math.abs(changeAngle) > ANGLE_THRESH) {
+            if (Math.abs(changeAngle) > ANGLE_THRESH_TURN) {
                 changeAngle = normalizeAbs(changeAngle * TURN_FACTOR, speed);
                 turn(changeAngle);
             } else {
                 brake();
-                break;
+                Timer.delay(0.2);
+                if (Math.abs(changeAngle) > ANGLE_THRESH_TURN) {
+                    break;
+                }
             }
             Timer.delay(ANGLE_CHECK_DELAY);
         }
@@ -220,6 +224,10 @@ public class DriveTrain {
      */
     public void reset() {
         navx.reset();
+    }
+
+    public void debugNavx() {
+        System.out.println(navx.getAngle());
     }
 
     /**
