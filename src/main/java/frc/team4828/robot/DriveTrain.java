@@ -12,16 +12,20 @@ public class DriveTrain {
     private TalonSRX fl, fr, bl, br;
     private AHRS navx;
 
+    private static final double ENC_RATIO = 25.464; // [ NU / Inch ] => [ NU / Rotations / 6π ]
+    private static final double TIMEOUT = 10;
+
     // MoveDistance Constants
-    private static final double ENC_RATIO = 78.33; // [ NU / Inch ] => [ NU / Rotations / 6π ]
-    private static final double CORRECTION_FACTOR = 0.2;
-    private static final double ANGLE_THRESH = 0.1;
-    private static final double ANGLE_CHECK_DELAY = 0.01;
-    private static final double TIMEOUT = 5;
+    private static final double MOVE_ANGLE_FACTOR = 0.1;
+    private static final double MOVE_RAMP_FACTOR = 0.1;
+    private static final double MOVE_ANGLE_THRESH = 1;
+    private static final double MOVE_ENC_THRESH = 10;
+    private static final double MOVE_CHECK_DELAY = 0.01;
 
     // TurnDegrees Constants
     private static final double TURN_FACTOR = 0.2;
-    private static final double ANGLE_THRESH_TURN = 1;
+    private static final double TURN_ANGLE_THRESH = 1;
+    private static final double TURN_CHECK_DELAY = 0.01;
 
     /**
      * DriveTrain for the robot.
@@ -85,15 +89,20 @@ public class DriveTrain {
     }
 
     /**
-     * Scales input so that it does not exceed a given maximum.
+     * /** Scales input so that it does not exceed a given maximum.
      * 
      * @param input A double that is to be normalized.
      * @param max Absolute maximum value of output.
      * @return Normalized value.
      */
-    private double normalizeAbs(double input, double max) {
+//    private double normalizeAbs(double input, double factor, double max) {
+//        return 2 * max / (1 + Math.pow(Math.E, (-factor * input))) - max;
+//    }
+
+    private double normalizeAbs(double input, double factor, double max) {
+        input *= factor;
         if (Math.abs(input) > Math.abs(max)) {
-            input *= Math.abs(max) / Math.abs(input);
+            input = Math.abs(max) * Math.signum(input);
         }
         return input;
     }
@@ -146,36 +155,49 @@ public class DriveTrain {
      * @param distance The distance in inches.
      * @param speed The speed.
      */
-    public void moveDistance(double distance, double speed) {
+    public void moveDistance(double distance, double maxSpeed) {
+        // Start values
         double startTime = Timer.getFPGATimestamp();
         double startEncL = fl.getSelectedSensorPosition(0);
-        double startEncR = fr.getSelectedSensorPosition(0);
         double startAngle = navx.getAngle();
-        double maxEnc = Math.abs(distance * ENC_RATIO);
-        double changeAngle;
-        if (distance < 0) {
-            speed *= -1;
-        }
-        while (Timer.getFPGATimestamp() - startTime < TIMEOUT) {
-            changeAngle = startAngle - navx.getAngle();
-            if (Math.abs(changeAngle) > ANGLE_THRESH) {
-                changeAngle = normalizeAbs(changeAngle * CORRECTION_FACTOR, speed);
-                if (speed * changeAngle > 0) {
-                    fr.set(ControlMode.PercentOutput, speed - changeAngle);
-                    br.set(ControlMode.PercentOutput, speed - changeAngle);
+        // Current values
+        double currentAngle;
+        double currentEnc;
+        // Target values
+        double targetEnc = distance * ENC_RATIO;
+
+        maxSpeed = Math.abs(maxSpeed) * Math.signum(distance); // Ensure max speed has the right sign
+        double speed = maxSpeed; // Set current speed to max
+
+        while (Timer.getFPGATimestamp() - startTime < TIMEOUT) { // Loop until break or timeout
+            currentAngle = startAngle - navx.getAngle();
+            currentEnc = targetEnc - fl.getSelectedSensorPosition(0) + startEncL;
+            // Correct angle
+            if (Math.abs(currentAngle) > MOVE_ANGLE_THRESH) {
+                currentAngle = normalizeAbs(currentAngle, MOVE_ANGLE_FACTOR, speed);
+                if (speed * currentAngle > 0) {
+                    fl.set(ControlMode.PercentOutput, speed);
+                    fr.set(ControlMode.PercentOutput, speed - currentAngle);
+                    bl.set(ControlMode.PercentOutput, speed);
+                    br.set(ControlMode.PercentOutput, speed - currentAngle);
                 } else {
-                    fl.set(ControlMode.PercentOutput, speed + changeAngle);
-                    bl.set(ControlMode.PercentOutput, speed + changeAngle);
+                    fl.set(ControlMode.PercentOutput, speed + currentAngle);
+                    fr.set(ControlMode.PercentOutput, speed);
+                    bl.set(ControlMode.PercentOutput, speed + currentAngle);
+                    br.set(ControlMode.PercentOutput, speed);
                 }
             } else {
                 drive(speed);
             }
-            if (Math.abs(fl.getSelectedSensorPosition(0) - startEncL) >= maxEnc
-                    || Math.abs(fr.getSelectedSensorPosition(0) - startEncR) >= maxEnc) {
+            // Check encoder
+            if (Math.abs(currentEnc) > MOVE_ENC_THRESH) {
+                speed = normalizeAbs(currentEnc, MOVE_RAMP_FACTOR, maxSpeed);
+            } else {
                 brake();
                 break;
             }
-            Timer.delay(ANGLE_CHECK_DELAY);
+            System.out.println(speed);
+            Timer.delay(MOVE_CHECK_DELAY);
         }
     }
 
@@ -186,21 +208,23 @@ public class DriveTrain {
      * @param speed The speed.
      */
     public void turnDegAbs(double angle, double speed) {
+        // Start values
         double startTime = Timer.getFPGATimestamp();
-        double changeAngle;
-        while (Timer.getFPGATimestamp() - startTime < TIMEOUT) {
-            changeAngle = angle - navx.getAngle();
-            if (Math.abs(changeAngle) > ANGLE_THRESH_TURN) {
-                changeAngle = normalizeAbs(changeAngle * TURN_FACTOR, speed);
-                turn(changeAngle);
+        // Current values
+        double currentAngle;
+
+        while (Timer.getFPGATimestamp() - startTime < TIMEOUT) { // Loop until break or timeout
+            currentAngle = angle - navx.getAngle();
+            // Check angle
+            if (Math.abs(currentAngle) > TURN_ANGLE_THRESH) {
+                currentAngle = normalizeAbs(currentAngle, TURN_FACTOR, speed);
+                turn(currentAngle);
             } else {
                 brake();
-                Timer.delay(0.2);
-                if (Math.abs(changeAngle) > ANGLE_THRESH_TURN) {
-                    break;
-                }
+                break;
             }
-            Timer.delay(ANGLE_CHECK_DELAY);
+
+            Timer.delay(TURN_CHECK_DELAY);
         }
     }
 
@@ -209,14 +233,13 @@ public class DriveTrain {
      */
     public void zeroEnc() {
         fl.setSelectedSensorPosition(0, 0, 10);
-        fr.setSelectedSensorPosition(0, 0, 10);
     }
 
     /**
      * Prints the current values of the encoders.
      */
     public void debugEnc() {
-        System.out.println("Left: " + fl.getSelectedSensorPosition(0) + " Right: " + fr.getSelectedSensorPosition(0));
+        System.out.println("Left: " + fl.getSelectedSensorPosition(0));
     }
 
     /**
@@ -235,9 +258,9 @@ public class DriveTrain {
      */
     public void updateDashboard() {
         double[] speeds = { fl.getMotorOutputPercent(), fr.getMotorOutputPercent() };
-        double[] enc = { fl.getSelectedSensorPosition(0), fr.getSelectedSensorPosition(0) };
+        double enc = fl.getSelectedSensorPosition(0);
         SmartDashboard.putNumberArray("Drive", speeds);
         SmartDashboard.putNumber("Angle", navx.getAngle());
-        SmartDashboard.putNumberArray("Encoders", enc);
+        SmartDashboard.putNumber("Encoder", enc);
     }
 }
