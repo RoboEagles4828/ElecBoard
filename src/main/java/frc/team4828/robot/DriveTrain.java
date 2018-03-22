@@ -21,11 +21,13 @@ public class DriveTrain {
     private static final double MOVE_ANGLE_THRESH = 1;
     private static final double MOVE_ENC_THRESH = 50;
     private static final double MOVE_CHECK_DELAY = 0.01;
+    private static final double MOVE_MIN_SPEED = 0.1;
 
     // TurnDegrees Constants
     private static final double TURN_FACTOR = 0.2;
     private static final double TURN_ANGLE_THRESH = 1;
     private static final double TURN_CHECK_DELAY = 0.01;
+    private static final double TURN_MIN_SPEED = 0.1;
 
     /**
      * DriveTrain for the robot.
@@ -95,10 +97,6 @@ public class DriveTrain {
      * @param max Absolute maximum value of output.
      * @return Normalized value.
      */
-//    private double normalizeAbs(double input, double factor, double max) {
-//        return 2 * max / (1 + Math.pow(Math.E, (-factor * input))) - max;
-//    }
-
     private double normalizeAbs(double input, double factor, double max) {
         input *= factor;
         if (Math.abs(input) > Math.abs(max)) {
@@ -106,6 +104,20 @@ public class DriveTrain {
         }
         return input;
     }
+
+    private double normalizeAbs(double input, double factor, double min, double max) {
+        input *= factor;
+        if (Math.abs(input) < Math.abs(min)) {
+            input = Math.abs(min) * Math.signum(input);
+        } else if (Math.abs(input) > Math.abs(max)) {
+            input = Math.abs(max) * Math.signum(input);
+        }
+        return input;
+    }
+
+//  private double normalizeAbs(double input, double factor, double max) {
+//      return 2 * max / (1 + Math.pow(Math.E, (-factor * input))) - max;
+//  }
 
     /**
      * Scales inputs so that they do not exceed a given maximum.
@@ -191,7 +203,7 @@ public class DriveTrain {
             }
             // Check encoder
             if (Math.abs(currentEnc) > MOVE_ENC_THRESH) {
-                speed = normalizeAbs(currentEnc, MOVE_RAMP_FACTOR, maxSpeed);
+                speed = normalizeAbs(currentEnc, MOVE_RAMP_FACTOR, MOVE_MIN_SPEED, maxSpeed);
             } else {
                 brake();
                 break;
@@ -217,7 +229,7 @@ public class DriveTrain {
             currentAngle = angle - navx.getAngle();
             // Check angle
             if (Math.abs(currentAngle) > TURN_ANGLE_THRESH) {
-                currentAngle = normalizeAbs(currentAngle, TURN_FACTOR, speed);
+                currentAngle = normalizeAbs(currentAngle, TURN_FACTOR, TURN_MIN_SPEED, speed);
                 turn(currentAngle);
             } else {
                 brake();
