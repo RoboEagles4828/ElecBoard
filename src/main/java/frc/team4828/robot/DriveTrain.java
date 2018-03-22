@@ -12,7 +12,7 @@ public class DriveTrain {
     private TalonSRX fl, fr, bl, br;
     private AHRS navx;
 
-    private static final double ENC_RATIO = 75; // [ NU / Inch ] => [ NU / Rotations / 6π ]
+    private static final double ENC_RATIO = 78.33; // [ NU / Inch ] => [ NU / Rotations / 6π ]
     private static final double TIMEOUT = 10;
 
     // MoveDistance Constants
@@ -89,7 +89,7 @@ public class DriveTrain {
     }
 
     /**
-     * /** Scales input so that it does not exceed a given maximum.
+     * Scales input so that it does not exceed a given maximum.
      * 
      * @param input A double that is to be normalized.
      * @param max Absolute maximum value of output.
@@ -196,6 +196,7 @@ public class DriveTrain {
                 brake();
                 break;
             }
+
             Timer.delay(MOVE_CHECK_DELAY);
         }
     }
