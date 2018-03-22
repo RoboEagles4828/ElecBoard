@@ -38,15 +38,9 @@ public class Robot extends IterativeRobot {
             drive.debugNavx();
             drive.debugEnc();
             Timer.delay(1);
-            drive.turnDegAbs(180, 0.5);
-            drive.debugNavx();
-            Timer.delay(1);
-            drive.moveDistance(108, 0.5);
+            drive.moveDistance(-108, 0.5);
             drive.debugNavx();
             drive.debugEnc();
-            Timer.delay(1);
-            drive.turnDegAbs(0, 0.5);
-            drive.debugNavx();
             doneAuton = true;
         }
         Timer.delay(.1);
